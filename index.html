@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>SooToday Local News!</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/my_style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		  	
+	</head>
+
+	<body>
+		<!-- Banner across top -->
+		<p style="text-align: center"><img src="images/banner.jpg" style="max-width='100%';"></p>
+		<!-- Sun on side of page -->
+		<p style="text-align: left"><img src="images/sun.jpg" style="position: fixed; "></p>
+		<div class="container">
+			
+			<!-- div that articles are loaded into -->		
+			<div id = content>
+			
+				<!-- 
+				Limits the number of articles that are loaded at a time
+				X amount of pages are loaded at first, and then another
+				X amount of pages are loaded when scrolled to the bottom of page
+				-->
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+				<script type="text/javascript">
+					//load first 5 articles
+					var ajaxurl = 'load_content.php';
+					var counter = 0; //what article will be loaded next
+					var story_amount = 3; //the number of stories to load
+					var data = {'story_id' : counter,
+								'amount_of_stories' : story_amount};
+					
+					//call php script to grab more stories from the database
+					function load_more_content(){
+						
+						$.post(ajaxurl, data, function (response) {
+							counter += story_amount;
+							data = {'story_id' : counter,
+								'amount_of_stories' : story_amount};
+							document.getElementById("content").innerHTML += response;
+						} );
+						
+					}
+					
+					load_more_content(); //load first group of content
+										
+					//determines when user has scrolled to bottom of screen and calls load_more_content function
+					$(window).scroll(function(){
+						var scroll_height = $(document).height();
+						var scroll_position = $(window).height() + $(window).scrollTop();
+						if ((scroll_height - scroll_position) / scroll_height === 0){
+							load_more_content();
+							
+						}
+					});
+					
+
+				</script>
+			</div>
+				
+		</div>
+
+	</body>
+</html>
