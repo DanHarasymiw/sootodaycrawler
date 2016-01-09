@@ -11,7 +11,6 @@
 	$username = 'root';
 	$password = 'ps42wwS';
 	
-
 	//define directory for images to be stored
 	define('DIRECTORY', 'images');
 	
@@ -31,12 +30,10 @@
 	//Select the database for use
 	mysqli_query($conn, 'USE localnews');
 	
-	
 	//get the web page contents
 	$target_url = 'http://www.sootoday.com/';
 	$html = new simple_html_dom();
 	$html->load_file($target_url);
-	
 	
 	//local news are stored in first occurrence of div class "inside clearfix"
 	$local_news_div = $html->find('div[class=inside clearfix]', 0);
@@ -44,7 +41,6 @@
 	//find all of the links in local news and reverse their order so that the most recent links have a higher id
 	$local_news_array = array_reverse($local_news_div->find('a'));
 	foreach($local_news_array as $news_title){
-
 		$website = ''; //used to keep track of which website uploaded the article, currently only sites are sootoday and local2
 
 		$news_title_untagged = str_replace(array('<b>', '</b>'), '', $news_title->innertext); //remove any tags from title
@@ -56,7 +52,6 @@
 		if (mysqli_num_rows($result) == 0){ //if no rows returned, story hasn't been stored yet
 			echo '<b>'.$news_title_untagged. '</b><br/>';
 		
-	
 			//Determine if news story is from sootoday or local2
 			$news_story_url = $news_title->href;
 			if ($news_story_url[0] == '/'){ //if story is from sootoday
@@ -66,7 +61,6 @@
 				//load the news story's web page
 				$news_story_html = new simple_html_dom();
 				$news_story_html->load_file($news_story_url);
-
 
 				//get the date of the article
 				$date_span = $news_story_html->find('span[class=content-written-by]', 0);
@@ -82,7 +76,6 @@
 				$counter = 0;//used to keep track of what paragraph we are at because first paragraph contains picture
 				$content = '';
 				
-		
 				//find all of the images at the top of the article
 				foreach ($content_div->find('img') as $relative_img_url){
 					//Create id number for picture and store that with url in pictures table
@@ -102,19 +95,8 @@
 					$element->outertext = '';
 				}
 
-				
-			
-					
-					
 				//add the paragraph to the content
 				$content = $content_div->innertext;
-				
-				
-
-
-
-
-
 			}
 			else if (strpos($news_story_url, 'local2') !== false){
 				$website = 'local2';
@@ -130,7 +112,6 @@
 				$date = date_create($date);
 				$date_string = date_format($date, 'l, F jS, Y');
 				
-				
 				$img_url = '';
 				$content = '';
 				//picture and content is stored in meta content
@@ -142,7 +123,6 @@
 					else if ($property == 'og:description') {
 						$content = $meta->getAttribute('content');
 					}
-
 				}
 
 				//insert the image
@@ -151,27 +131,15 @@
 				//save the url to the video
 				$sql = 'INSERT INTO local2_videos VALUES ("' . $news_title_untagged . '", "' . $news_story_url . '")';
 				mysqli_query($conn, $sql);
-
-
-
 			}
-			
-			
 
-			
 			//prepare the sql statement so that any ' and " that might be found in article don't break out of sql statement
 			$sql = $conn->prepare('INSERT INTO news_article VALUES (NULL, ?, ?, ?, ?)');
 			$sql->bind_param('ssss', $news_title_untagged, $date_string, $content, $website);
 			$sql->execute();
 			echo mysqli_error($conn);
-			
 		}
-		
-		
-	
 	}
-	
-
 ?>
 
 <!-- functions -->
@@ -185,7 +153,5 @@
 		//Get the picture and copy it into images folder and name it based on its ID in database
 		$picture = file_get_contents($img_url);
 		file_put_contents(DIRECTORY . '/' . $picID . '.jpg', $picture);
-	
 	}
-
 ?>
